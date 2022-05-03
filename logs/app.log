@@ -1,0 +1,11 @@
+{"time":"2022-05-03T21:16:58.572785+08:00","level":"INFO","prefix":"[logid:1651583818]","file":"storage.go","line":"63","message":"[sql:SELECT long_url FROM short_url_record WHERE short_url = ?] [param:U]"}
+{"time":"2022-05-03T21:16:58.580733+08:00","level":"INFO","prefix":"[logid:1651583818]","file":"handler.go","line":"58","message":"redirect to abc"}
+method=GET, uri=/U, status=302
+{"time":"2022-05-03T21:17:16.374044+08:00","level":"INFO","prefix":"[logid:1651583836]","file":"storage.go","line":"49","message":"[sql:INSERT INTO short_url_record (long_url, short_url, unique_id) VALUES (?, ?, ?)] [param:&{LongURL:https://www.baidu.com ShortURL:W UniqueID:58}]"}
+method=GET, uri=/shortchain/gen?url=https://www.baidu.com, status=200
+{"time":"2022-05-03T21:17:18.655068+08:00","level":"INFO","prefix":"[logid:1651583838]","file":"storage.go","line":"63","message":"[sql:SELECT long_url FROM short_url_record WHERE short_url = ?] [param:W]"}
+{"time":"2022-05-03T21:17:18.663274+08:00","level":"INFO","prefix":"[logid:1651583838]","file":"handler.go","line":"58","message":"redirect to https://www.baidu.com"}
+method=GET, uri=/W, status=302
+{"time":"2022-05-03T21:17:28.854026+08:00","level":"INFO","prefix":"[logid:1651583848]","file":"storage.go","line":"63","message":"[sql:SELECT long_url FROM short_url_record WHERE short_url = ?] [param:W]"}
+{"time":"2022-05-03T21:17:28.868368+08:00","level":"INFO","prefix":"[logid:1651583848]","file":"handler.go","line":"58","message":"redirect to https://www.baidu.com"}
+method=GET, uri=/W, status=302

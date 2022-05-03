@@ -1,0 +1,12 @@
+[short_url]
+    addr = "127.0.0.1:3306"
+    user = "root"
+    pwd = "123456"
+    dbname = "dev"
+
+[redis]
+    addr = "127.0.0.1:6379"
+    pwd = ""
+
+[logger]
+    file_path = "./logs/app.log"
