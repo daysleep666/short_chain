@@ -3,6 +3,7 @@
     user = "root"
     pwd = "123456"
     dbname = "dev"
+    table_cnt = 1
 
 [redis]
     addr = "127.0.0.1:6379"
@@ -10,3 +11,4 @@
 
 [logger]
     file_path = "./logs/app.log"
+    level = 1

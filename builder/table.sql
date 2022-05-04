@@ -1,4 +1,4 @@
-CREATE TABLE short_url_record (
+CREATE TABLE short_url_record_0 (
     id INT NOT NULL PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
     long_url VARCHAR(1024) NOT NULL COMMENT '长url',
     short_url VARCHAR(1024) NOT NULL COMMENT '短链',
@@ -7,5 +7,5 @@ CREATE TABLE short_url_record (
     mtime DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '修改时间'
 ) ENGINE=Innodb DEFAULT CHARSET='utf8' COMMENT '短链记录表';
 
-ALTER TABLE short_url_record ADD UNIQUE uni_long_url (long_url);
-ALTER TABLE short_url_record ADD UNIQUE uni_short_url (short_url);
+ALTER TABLE short_url_record_0 ADD UNIQUE uni_long_url (long_url);
+ALTER TABLE short_url_record_0 ADD UNIQUE uni_short_url (short_url);

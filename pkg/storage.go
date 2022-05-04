@@ -3,6 +3,7 @@ package pkg
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/daysleep666/short_chain/config"
 	"github.com/daysleep666/short_chain/pkg/repo"
@@ -23,16 +24,18 @@ func (p *ShortURLStorageSaveParam) Check() error {
 
 type ShortURLStorageService interface {
 	Save(ctx context.Context, param *ShortURLStorageSaveParam) error
-	Search(ctx context.Context, shortURL string) (string, error)
+	Search(ctx context.Context, uniqueID uint64) (string, error)
 }
 
 type shortURLStorageService struct {
-	logger Logger
+	logger   Logger
+	tableCnt int16
 }
 
-func NewShortURLStorageService(logger Logger) ShortURLStorageService {
+func NewShortURLStorageService(logger Logger, tableCnt int16) ShortURLStorageService {
 	return &shortURLStorageService{
-		logger: logger,
+		logger:   logger,
+		tableCnt: tableCnt,
 	}
 }
 
@@ -45,7 +48,7 @@ func (sss *shortURLStorageService) Save(ctx context.Context, param *ShortURLStor
 		sss.logger.Warnf("[save failed] [invalid param]")
 		return
 	}
-	sql := "INSERT INTO short_url_record (long_url, short_url, unique_id) VALUES (?, ?, ?)"
+	sql := fmt.Sprintf("INSERT INTO %s (long_url, short_url, unique_id) VALUES (?, ?, ?)", sss.genTableName(param.UniqueID))
 	sss.logger.Infof("[sql:%s] [param:%+v]", sql, param)
 	_, err = repo.SHORT_URL_RECORD_DB.Exec(sql, param.LongURL, param.ShortURL, param.UniqueID)
 	if err != nil {
@@ -55,16 +58,14 @@ func (sss *shortURLStorageService) Save(ctx context.Context, param *ShortURLStor
 	return
 }
 
-func (sss *shortURLStorageService) Search(ctx context.Context, shortURL string) (string, error) {
-	if len(shortURL) == 0 {
+func (sss *shortURLStorageService) Search(ctx context.Context, uniqueID uint64) (string, error) {
+	if uniqueID == 0 {
 		return "", config.PARAM_ERROR
 	}
-	sqlStr := "SELECT long_url FROM short_url_record WHERE short_url = ?"
-	sss.logger.Infof("[sql:%s] [param:%+v]", sqlStr, shortURL)
-	row := repo.SHORT_URL_RECORD_DB.QueryRowContext(ctx, sqlStr, shortURL)
-	// var res struct {
-	// 	LongURL string `json:"long_url"`
-	// }
+	sqlStr := fmt.Sprintf("SELECT long_url FROM %s WHERE unique_id = ?", sss.genTableName(uniqueID))
+	sss.logger.Infof("[sql:%s] [param:%+v]", sqlStr, uniqueID)
+	row := repo.SHORT_URL_RECORD_DB.QueryRowContext(ctx, sqlStr, uniqueID)
+
 	var longURL string
 	if err := row.Scan(&longURL); err != nil {
 		if err == sql.ErrNoRows {
@@ -74,4 +75,8 @@ func (sss *shortURLStorageService) Search(ctx context.Context, shortURL string) 
 		return "", config.DB_ERROR
 	}
 	return longURL, nil
+}
+
+func (sss *shortURLStorageService) genTableName(uniqueID uint64) string {
+	return fmt.Sprintf("short_url_record_%d", uniqueID%uint64(sss.tableCnt))
 }

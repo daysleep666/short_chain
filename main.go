@@ -9,8 +9,12 @@ import (
 	"github.com/labstack/gommon/log"
 )
 
+const (
+	CONFIG_PATH = "./config/app.toml"
+)
+
 func main() {
-	pkg.MustInit()
+	pkg.MustInit(CONFIG_PATH)
 
 	e := echo.New()
 	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{

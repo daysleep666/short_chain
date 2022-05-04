@@ -93,7 +93,9 @@ func (sc *ShortChainService) Search(ctx context.Context, shortURL string) (longU
 		return
 	}
 
-	longURL, err = sc.serv.shortURLStorage.Search(ctx, shortURL)
+	uniqueID := sc.serv.converter.Base62ToNumber(shortURL)
+
+	longURL, err = sc.serv.shortURLStorage.Search(ctx, uniqueID)
 	if err != nil {
 		return
 	}

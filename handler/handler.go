@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 
+	"github.com/daysleep666/short_chain/config"
 	"github.com/daysleep666/short_chain/pkg"
 	"github.com/daysleep666/short_chain/service"
 	"github.com/labstack/echo"
@@ -23,7 +24,7 @@ func GenShortChain(c echo.Context) (err error) {
 	ser, err := service.NewShortChainService(&service.ShortChainServiceParam{
 		UniqueIDService:        pkg.NewUniqueIDService(c.Logger()),
 		ConverterService:       pkg.NewConverterService(),
-		ShortURLStorageService: pkg.NewShortURLStorageService(c.Logger()),
+		ShortURLStorageService: pkg.NewShortURLStorageService(c.Logger(), config.CONFIG_INSTANCE.ShortURLMysqlConfig.TableCnt),
 		Log:                    c.Logger(),
 	})
 	if err != nil {
@@ -44,7 +45,7 @@ func ShortChainRedirect(c echo.Context) (err error) {
 	ser, err := service.NewShortChainService(&service.ShortChainServiceParam{
 		UniqueIDService:        pkg.NewUniqueIDService(c.Logger()),
 		ConverterService:       pkg.NewConverterService(),
-		ShortURLStorageService: pkg.NewShortURLStorageService(c.Logger()),
+		ShortURLStorageService: pkg.NewShortURLStorageService(c.Logger(), config.CONFIG_INSTANCE.ShortURLMysqlConfig.TableCnt),
 		Log:                    c.Logger(),
 	})
 	if err != nil {
