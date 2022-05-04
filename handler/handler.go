@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/daysleep666/short_chain/config"
 	"github.com/daysleep666/short_chain/pkg"
@@ -32,7 +33,7 @@ func GenShortChain(c echo.Context) (err error) {
 	}
 
 	return MakeResponse(c, err, map[string]string{
-		"surl": surl,
+		"surl": fmt.Sprintf("%s/%s", config.CONFIG_INSTANCE.ServerConfig.Domain, surl),
 	})
 }
 

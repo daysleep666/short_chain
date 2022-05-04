@@ -24,10 +24,18 @@ func (p *ShortURLStorageSaveParam) Check() error {
 	return nil
 }
 
+type ShortURLDetail struct {
+	ShortURL string
+	LongURL  string
+	UniqueID uint64
+	ViewCnt  int64
+}
+
 type ShortURLStorageService interface {
 	Save(ctx context.Context, param *ShortURLStorageSaveParam) error
-	QueryByUniqueID(ctx context.Context, uniqueID uint64) (longURL string, shortURL string, err error)
+	QueryByUniqueID(ctx context.Context, uniqueID uint64) (detail ShortURLDetail, err error)
 	QueryByLongURL(ctx context.Context, longURL string) (output []uint64, err error)
+	IncViewCnt(uniqueID uint64) (err error)
 }
 
 type shortURLStorageService struct {
@@ -96,23 +104,23 @@ func (sss *shortURLStorageService) Save(ctx context.Context, param *ShortURLStor
 	return
 }
 
-func (sss *shortURLStorageService) QueryByUniqueID(ctx context.Context, uniqueID uint64) (longURL string, shortURL string, err error) {
+func (sss *shortURLStorageService) QueryByUniqueID(ctx context.Context, uniqueID uint64) (detail ShortURLDetail, err error) {
 	if uniqueID == 0 {
 		err = config.PARAM_ERROR
 		return
 	}
-	sqlStr := fmt.Sprintf("SELECT long_url, short_url FROM %s WHERE unique_id = ?", sss.genShortURLRecordTableName(uniqueID))
+	sqlStr := fmt.Sprintf("SELECT long_url, short_url, view_cnt FROM %s WHERE unique_id = ?", sss.genShortURLRecordTableName(uniqueID))
 	sss.logger.Infof("[sql:%s] [param:%+v]", sqlStr, uniqueID)
 	row := repo.SHORT_URL_RECORD_DB.QueryRowContext(ctx, sqlStr, uniqueID)
 
-	if err := row.Scan(&longURL, &shortURL); err != nil {
+	if err := row.Scan(&detail.LongURL, &detail.ShortURL, &detail.ViewCnt); err != nil {
 		if err == sql.ErrNoRows {
-			return "", "", nil
+			return ShortURLDetail{}, nil
 		}
 		sss.logger.Errorf("[scan failed] [err:%v]", err)
-		return "", "", config.DB_ERROR
+		return ShortURLDetail{}, config.DB_ERROR
 	}
-	return longURL, shortURL, nil
+	return
 }
 
 func (sss *shortURLStorageService) QueryByLongURL(ctx context.Context, longURL string) (output []uint64, err error) {
@@ -142,6 +150,22 @@ func (sss *shortURLStorageService) QueryByLongURL(ctx context.Context, longURL s
 		return nil, config.DB_ERROR
 	}
 
+	return
+}
+
+func (sss *shortURLStorageService) IncViewCnt(uniqueID uint64) (err error) {
+	if uniqueID == 0 {
+		err = config.PARAM_ERROR
+		return
+	}
+
+	sql := fmt.Sprintf("UPDATE %s SET view_cnt = view_cnt + 1 WHERE unique_id = ?", sss.genShortURLRecordTableName(uniqueID))
+	sss.logger.Infof("[sql:%s] [uniqueID:%+v]", sql, uniqueID)
+	_, err = repo.SHORT_URL_RECORD_DB.Exec(sql, uniqueID)
+	if err != nil {
+		sss.logger.Errorf("[update failed] [err:%v]", err)
+		return
+	}
 	return
 }
 

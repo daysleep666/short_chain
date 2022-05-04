@@ -22,9 +22,14 @@ func main() {
 		Output: log.Output(),
 	}))
 	e.Use(mid.AddLogger)
-
+	e.Use(middleware.CORS())
 	e.GET("/shortchain/gen", handler.GenShortChain)
+	e.POST("/shortchain/gen", handler.GenShortChain)
 	e.GET("/shortchain/query", handler.QueryShortChain)
+	e.POST("/shortchain/query", handler.QueryShortChain)
+	e.File("/favicon.ico", "static/images/favicon.ico")
 	e.GET("/:url", handler.ShortChainRedirect)
+	e.Static("web", "static")
+
 	e.Logger.Fatal(e.Start(":1234"))
 }

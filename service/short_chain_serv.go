@@ -95,15 +95,17 @@ func (sc *ShortChainService) QueryByShortURL(ctx context.Context, shortURL strin
 
 	uniqueID := sc.serv.converter.Base62ToNumber(shortURL)
 
-	longURL, _, err = sc.serv.shortURLStorage.QueryByUniqueID(ctx, uniqueID)
+	detail, err := sc.serv.shortURLStorage.QueryByUniqueID(ctx, uniqueID)
 	if err != nil {
 		return
 	}
-
+	longURL = detail.LongURL
 	if len(longURL) == 0 {
 		err = config.NONE_LONG_URL_ERROR
 		return
 	}
+
+	sc.serv.shortURLStorage.IncViewCnt(uniqueID)
 
 	return
 }
@@ -111,6 +113,7 @@ func (sc *ShortChainService) QueryByShortURL(ctx context.Context, shortURL strin
 type ShortURLDetail struct {
 	ShortURL string `json:"short_url,omitempty"`
 	UniqueID uint64 `json:"-"`
+	ViewCnt  int64  `json:"view_cnt"`
 }
 
 func (sc *ShortChainService) QueryByLongURL(ctx context.Context, longURL string) (res []*ShortURLDetail, err error) {
@@ -129,13 +132,14 @@ func (sc *ShortChainService) QueryByLongURL(ctx context.Context, longURL string)
 	}
 
 	for _, uniqueID := range uniqueIDGroup {
-		_, shortURL, err := sc.serv.shortURLStorage.QueryByUniqueID(context.TODO(), uniqueID)
+		detail, err := sc.serv.shortURLStorage.QueryByUniqueID(context.TODO(), uniqueID)
 		if err != nil {
 			return nil, err
 		}
 		res = append(res, &ShortURLDetail{
-			ShortURL: shortURL,
-			UniqueID: uniqueID,
+			ShortURL: detail.ShortURL,
+			UniqueID: detail.UniqueID,
+			ViewCnt:  detail.ViewCnt,
 		})
 	}
 

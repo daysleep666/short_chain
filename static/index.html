@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<!-- <script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script> -->
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<script src="https://ajax.aspnetcdn.com/ajax/jQuery/jquery-3.5.1.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="/web/js/fancyTable.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $("#gen").click(function () {
+            $.post("http://127.0.0.1:1234/shortchain/gen", { url: $('input[name="gen_url"]').val() }, function (data, status) {
+                if (data.status_code == 0) {
+                    $("#result").text(data.data.surl);
+                } else {
+                    $("#result").text(data.msg);
+                }
+
+            });
+        });
+        $("#query").click(function () {
+            $.post("http://127.0.0.1:1234/shortchain/query", { url: $('input[name="query_url"]').val() }, function (data, status) {
+                $("#showTable").find("tbody").empty();
+                if (data.status_code == 0) {
+                    for (i in data.data) {
+                        var row = $("<tr>");
+                        row.append($("<td>", {
+                            html: data.data[i].short_url,
+                            style: "padding:2px;"
+                        }));
+                        row.append($("<td>", {
+                            html: data.data[i].view_cnt,
+                            style: "padding:2px;"
+                        }));
+                        row.appendTo($("#showTable").find("tbody"));
+                    }
+                } else {
+                    $("#result").text(data.msg);
+                }
+
+            });
+        });
+    });
+
+    $(document).ready(function () {
+
+        // And make them fancy
+        $("#showTable").fancyTable({
+            sortColumn: 1,
+            pagination: true,
+            perPage: 20,
+            globalSearch: true
+        });
+    });
+
+</script>
+
+<head>
+    <meta charset="utf-8">
+    <title>短链生成服务</title>
+</head>
+
+<body>
+    <ul class="nav nav-tabs">
+        <li class="active"><a data-toggle="tab" href="#home">生成短链</a></li>
+        <li><a data-toggle="tab" href="#menu1">长链查询</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div id="home" class="tab-pane fade in active">
+            <input type="text" name="gen_url" />
+            <button type="button" id="gen">Click Me!</button>
+            <br>
+            <p>生成结果</p>
+            <p id="result"></p>
+        </div>
+        <div id="menu1" class="tab-pane fade">
+            <input type="text" name="query_url" />
+            <button type="button" id="query">Click Me!</button>
+
+            <div class="container" style="padding: 30px 0;">
+                <table id="showTable" class="table table-striped sampleTable">
+                    <thead>
+                        <tr>
+                            <th>短链</th>
+                            <th>点击数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+
+            <br>
+        </div>
+    </div>
+
+</body>
+
+</html>

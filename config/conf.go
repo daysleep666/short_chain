@@ -23,14 +23,15 @@ type LoggerConfig struct {
 }
 
 type ServerConfig struct {
-	MachineID int64 `toml:"machine_id"`
+	Domain    string `toml:"domain"`
+	MachineID int64  `toml:"machine_id"`
 }
 
 type Config struct {
 	LoggerConfig        LoggerConfig `toml:"logger"`
 	RedisConfig         ReisConfig   `toml:"redis"`
 	ShortURLMysqlConfig MysqlConfig  `toml:"short_url"`
-	ServerConfig        ServerConfig `toml:"machine_id"`
+	ServerConfig        ServerConfig `toml:"server"`
 }
 
 var CONFIG_INSTANCE Config
