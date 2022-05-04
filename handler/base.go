@@ -7,7 +7,7 @@ import (
 
 type BaseResposne struct {
 	Msg        string      `json:"msg,omitempty"`
-	StatusCode int         `json:"status_code,omitempty"`
+	StatusCode int         `json:"status_code"`
 	Data       interface{} `json:"data,omitempty"`
 }
 

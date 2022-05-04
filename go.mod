@@ -8,7 +8,10 @@ require (
 	github.com/labstack/echo v3.3.10+incompatible
 )
 
-require github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible // indirect
+	go.uber.org/atomic v1.9.0 // indirect
+)
 
 require (
 	github.com/BurntSushi/toml v1.1.0

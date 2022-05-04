@@ -24,6 +24,7 @@ func main() {
 	e.Use(mid.AddLogger)
 
 	e.GET("/shortchain/gen", handler.GenShortChain)
+	e.GET("/shortchain/query", handler.QueryShortChain)
 	e.GET("/:url", handler.ShortChainRedirect)
 	e.Logger.Fatal(e.Start(":1234"))
 }

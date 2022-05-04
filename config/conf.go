@@ -23,12 +23,17 @@ type LoggerConfig struct {
 }
 
 type ServerConfig struct {
+	MachineID int64 `toml:"machine_id"`
+}
+
+type Config struct {
 	LoggerConfig        LoggerConfig `toml:"logger"`
 	RedisConfig         ReisConfig   `toml:"redis"`
 	ShortURLMysqlConfig MysqlConfig  `toml:"short_url"`
+	ServerConfig        ServerConfig `toml:"machine_id"`
 }
 
-var CONFIG_INSTANCE ServerConfig
+var CONFIG_INSTANCE Config
 
 func InitConfig(filePath string) (err error) {
 	if _, err = toml.DecodeFile(filePath, &CONFIG_INSTANCE); err != nil {

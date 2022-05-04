@@ -86,7 +86,7 @@ func (sc *ShortChainService) Generate(ctx context.Context, longSurl string) (sho
 	return
 }
 
-func (sc *ShortChainService) Search(ctx context.Context, shortURL string) (longURL string, err error) {
+func (sc *ShortChainService) QueryByShortURL(ctx context.Context, shortURL string) (longURL string, err error) {
 	if len(shortURL) == 0 {
 		err = config.PARAM_ERROR
 		sc.log.Errorf("none shortURL")
@@ -95,7 +95,7 @@ func (sc *ShortChainService) Search(ctx context.Context, shortURL string) (longU
 
 	uniqueID := sc.serv.converter.Base62ToNumber(shortURL)
 
-	longURL, err = sc.serv.shortURLStorage.Search(ctx, uniqueID)
+	longURL, _, err = sc.serv.shortURLStorage.QueryByUniqueID(ctx, uniqueID)
 	if err != nil {
 		return
 	}
@@ -103,6 +103,40 @@ func (sc *ShortChainService) Search(ctx context.Context, shortURL string) (longU
 	if len(longURL) == 0 {
 		err = config.NONE_LONG_URL_ERROR
 		return
+	}
+
+	return
+}
+
+type ShortURLDetail struct {
+	ShortURL string `json:"short_url,omitempty"`
+	UniqueID uint64 `json:"-"`
+}
+
+func (sc *ShortChainService) QueryByLongURL(ctx context.Context, longURL string) (res []*ShortURLDetail, err error) {
+	if len(longURL) == 0 {
+		err = config.PARAM_ERROR
+		sc.log.Errorf("none longURL")
+		return
+	}
+
+	uniqueIDGroup, err := sc.serv.shortURLStorage.QueryByLongURL(context.TODO(), longURL)
+	if err != nil {
+		return
+	}
+	if len(uniqueIDGroup) == 0 {
+		return nil, nil
+	}
+
+	for _, uniqueID := range uniqueIDGroup {
+		_, shortURL, err := sc.serv.shortURLStorage.QueryByUniqueID(context.TODO(), uniqueID)
+		if err != nil {
+			return nil, err
+		}
+		res = append(res, &ShortURLDetail{
+			ShortURL: shortURL,
+			UniqueID: uniqueID,
+		})
 	}
 
 	return

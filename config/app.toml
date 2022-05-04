@@ -12,3 +12,6 @@
 [logger]
     file_path = "./logs/app.log"
     level = 1
+
+[server]
+    machine_id = 1
