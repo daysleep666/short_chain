@@ -38,7 +38,9 @@ func GenShortChain(c echo.Context) (err error) {
 }
 
 type QueryShortChainReq struct {
-	URL string `form:"url"`
+	URL  string `form:"url"`
+	Page uint64 `form:"page"`
+	Cnt  uint64 `form:"cnt"`
 }
 
 func QueryShortChain(c echo.Context) (err error) {
@@ -54,7 +56,11 @@ func QueryShortChain(c echo.Context) (err error) {
 		return MakeResponse(c, err, nil)
 	}
 
-	res, err := ser.QueryByLongURL(context.TODO(), req.URL)
+	res, err := ser.QueryByLongURL(context.TODO(), &service.QueryByLongURLParam{
+		LongURL: req.URL,
+		Page:    req.Page,
+		Cnt:     req.Cnt,
+	})
 	if err != nil {
 		c.Logger().Errorf("[query by long_url failed] [err:%v]", err)
 		return MakeResponse(c, err, nil)

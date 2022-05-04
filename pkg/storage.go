@@ -34,7 +34,8 @@ type ShortURLDetail struct {
 type ShortURLStorageService interface {
 	Save(ctx context.Context, param *ShortURLStorageSaveParam) error
 	QueryByUniqueID(ctx context.Context, uniqueID uint64) (detail ShortURLDetail, err error)
-	QueryByLongURL(ctx context.Context, longURL string) (output []uint64, err error)
+	QueryByLongURL(ctx context.Context, longURL string, page uint64, cnt uint64) (output []uint64, err error)
+	Count(ctx context.Context, longURL string) (cnt uint64, err error)
 	IncViewCnt(uniqueID uint64) (err error)
 }
 
@@ -123,14 +124,29 @@ func (sss *shortURLStorageService) QueryByUniqueID(ctx context.Context, uniqueID
 	return
 }
 
-func (sss *shortURLStorageService) QueryByLongURL(ctx context.Context, longURL string) (output []uint64, err error) {
+func (sss *shortURLStorageService) Count(ctx context.Context, longURL string) (cnt uint64, err error) {
+	if len(longURL) == 0 {
+		return 0, config.PARAM_ERROR
+	}
+	longURLMD5 := sss.longSURL2MD5(longURL)
+	sqlStr := fmt.Sprintf("SELECT COUNT(*) FROM %s WHERE long_url_md5 = ? and long_url = ?", sss.genLongURLRecordTableName(longURLMD5))
+	sss.logger.Infof("[sql:%s] [long_url:%s] [long_url_md5:%d]", sqlStr, longURL, longURLMD5)
+	row := repo.SHORT_URL_RECORD_DB.QueryRowContext(ctx, sqlStr, longURLMD5, longURL)
+	if err := row.Scan(&cnt); err != nil {
+		sss.logger.Errorf("[query failed] [err:%v]", err)
+		return 0, config.DB_ERROR
+	}
+	return
+}
+
+func (sss *shortURLStorageService) QueryByLongURL(ctx context.Context, longURL string, page uint64, cnt uint64) (output []uint64, err error) {
 	if len(longURL) == 0 {
 		return nil, config.PARAM_ERROR
 	}
 	longURLMD5 := sss.longSURL2MD5(longURL)
-	sqlStr := fmt.Sprintf("SELECT unique_id FROM %s WHERE long_url_md5 = ? and long_url = ?", sss.genLongURLRecordTableName(longURLMD5))
+	sqlStr := fmt.Sprintf("SELECT unique_id FROM %s WHERE long_url_md5 = ? AND long_url = ? LIMIT ?, ?", sss.genLongURLRecordTableName(longURLMD5))
 	sss.logger.Infof("[sql:%s] [long_url:%s] [long_url_md5:%d]", sqlStr, longURL, longURLMD5)
-	rows, err := repo.SHORT_URL_RECORD_DB.QueryContext(ctx, sqlStr, longURLMD5, longURL)
+	rows, err := repo.SHORT_URL_RECORD_DB.QueryContext(ctx, sqlStr, longURLMD5, longURL, (page-1)*cnt, cnt)
 	if err != nil {
 		sss.logger.Errorf("[query failed] [err:%v]", err)
 		return nil, config.DB_ERROR

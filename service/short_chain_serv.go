@@ -7,6 +7,10 @@ import (
 	"github.com/daysleep666/short_chain/pkg"
 )
 
+const (
+	MAX_PAGE_CNT = 100
+)
+
 type ShortChainService struct {
 	log pkg.Logger
 
@@ -116,32 +120,61 @@ type ShortURLDetail struct {
 	ViewCnt  int64  `json:"view_cnt"`
 }
 
-func (sc *ShortChainService) QueryByLongURL(ctx context.Context, longURL string) (res []*ShortURLDetail, err error) {
-	if len(longURL) == 0 {
+type QueryByLongURLParam struct {
+	LongURL string
+	Page    uint64
+	Cnt     uint64
+}
+
+func (p *QueryByLongURLParam) Check() error {
+	if len(p.LongURL) == 0 {
+		return config.PARAM_ERROR
+	}
+	if p.Page == 0 {
+		return config.PARAM_ERROR
+	}
+	if p.Cnt == 0 || p.Cnt > MAX_PAGE_CNT {
+		return config.PARAM_ERROR
+	}
+	return nil
+}
+
+type QueryByLongURLRes struct {
+	Group []*ShortURLDetail `json:"group"`
+	Total uint64            `json:"total"`
+}
+
+func (sc *ShortChainService) QueryByLongURL(ctx context.Context, param *QueryByLongURLParam) (res QueryByLongURLRes, err error) {
+	if param == nil {
 		err = config.PARAM_ERROR
 		sc.log.Errorf("none longURL")
 		return
 	}
 
-	uniqueIDGroup, err := sc.serv.shortURLStorage.QueryByLongURL(context.TODO(), longURL)
+	uniqueIDGroup, err := sc.serv.shortURLStorage.QueryByLongURL(context.TODO(), param.LongURL, param.Page, param.Cnt)
 	if err != nil {
 		return
 	}
 	if len(uniqueIDGroup) == 0 {
-		return nil, nil
+		return res, nil
 	}
 
 	for _, uniqueID := range uniqueIDGroup {
 		detail, err := sc.serv.shortURLStorage.QueryByUniqueID(context.TODO(), uniqueID)
 		if err != nil {
-			return nil, err
+			return res, err
 		}
-		res = append(res, &ShortURLDetail{
+		res.Group = append(res.Group, &ShortURLDetail{
 			ShortURL: detail.ShortURL,
 			UniqueID: detail.UniqueID,
 			ViewCnt:  detail.ViewCnt,
 		})
 	}
 
+	cnt, err := sc.serv.shortURLStorage.Count(context.TODO(), param.LongURL)
+	if err != nil {
+		return
+	}
+	res.Total = cnt
 	return
 }
