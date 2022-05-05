@@ -14,6 +14,7 @@ func AddLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		c.Logger().SetOutput(log.Output())
 		c.Logger().SetLevel(log.Lvl(config.CONFIG_INSTANCE.LoggerConfig.Level))
 		c.Logger().SetPrefix(fmt.Sprintf("[logid:%d]", time.Now().Unix()))
+		c.Logger().SetPrefix(fmt.Sprintf("%d", time.Now().UnixNano()))
 		return next(c)
 	}
 }
