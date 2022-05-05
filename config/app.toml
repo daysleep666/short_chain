@@ -1,12 +1,12 @@
 [short_url]
-    addr = "127.0.0.1:3306"
+    addr = "mysql_me:3306"
     user = "root"
     pwd = "123456"
     dbname = "dev"
     table_cnt = 1
 
 [redis]
-    addr = "127.0.0.1:6379"
+    addr = "redis_me:6379"
     pwd = ""
 
 [logger]
@@ -15,4 +15,4 @@
 
 [server]
     machine_id = 1
-    domain = "http://127.0.0.1:1234"
+    domain = "http://39.100.89.154"
