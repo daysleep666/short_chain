@@ -19,3 +19,10 @@ func AddLogger(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func ReqStart(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		c.Logger().Infof("url:%s", c.Request().URL)
+		return next(c)
+	}
+}

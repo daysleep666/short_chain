@@ -72,7 +72,7 @@ func (sc *ShortChainService) Generate(ctx context.Context, longSurl string) (sho
 		sc.log.Errorf("[gen unique id failed] [err:%v]", err)
 		return
 	}
-	sc.log.Info("[unique_id:%d]", uniqueID)
+	sc.log.Infof("[unique_id:%d]", uniqueID)
 	// base62
 	shortURL = sc.serv.converter.NumberToBase62(uniqueID)
 

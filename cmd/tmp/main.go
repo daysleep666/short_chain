@@ -1,22 +1,28 @@
 package main
 
-import (
-	"context"
-	"fmt"
-	"time"
+import "fmt"
 
-	"github.com/daysleep666/short_chain/pkg"
-)
-
-func main() {
-	s := pkg.NewUniqueIDSnowflakeService(1)
-	do := func() {
-		for i := 0; i < 10000; i++ {
-			id, _ := s.Generate(context.Background())
-			fmt.Println(id)
+func findDuplicates(nums []int) (result []int) {
+	for i := 0; i < len(nums); {
+		if nums[i]-1 == i || nums[i] == -1 {
+			i++
+			continue
+		}
+		idx := nums[i] - 1
+		num := nums[idx]
+		if nums[i] == num {
+			result = append(result, num)
+			nums[i] = -1
+			i++
+		} else {
+			nums[i], nums[idx] = nums[idx], nums[i]
 		}
 	}
-	go do()
-	go do()
-	time.Sleep(time.Second)
+	return
+}
+
+func main() {
+	fmt.Println(findDuplicates([]int{4, 3, 2, 7, 8, 2, 3, 1}))
+	fmt.Println(findDuplicates([]int{1, 1, 2}))
+	fmt.Println(findDuplicates([]int{1}))
 }

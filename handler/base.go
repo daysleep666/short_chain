@@ -20,6 +20,7 @@ func MakeResponse(c echo.Context, err error, data interface{}) error {
 		c.Logger().Errorf("[unknown err] [err:%v]", err)
 		confErr = config.UNKNOWN_ERROR
 	}
+	c.Logger().Info("[errno:%d] [msg:%s] [code:%d]", confErr.StatusCode, confErr.Msg, confErr.HTTPCode)
 	return c.JSON(confErr.HTTPCode, BaseResposne{
 		Msg:        confErr.Msg,
 		StatusCode: confErr.StatusCode,

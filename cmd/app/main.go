@@ -22,6 +22,7 @@ func main() {
 		Output: log.Output(),
 	}))
 	e.Use(mid.AddLogger)
+	e.Use(mid.ReqStart)
 	e.Use(middleware.CORS())
 	e.GET("/shortchain/gen", handler.GenShortChain)
 	e.POST("/shortchain/gen", handler.GenShortChain)
