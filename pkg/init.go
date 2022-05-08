@@ -4,20 +4,15 @@ import (
 	"log"
 	"net/http"
 	_ "net/http/pprof"
-	"strconv"
 
 	"github.com/daysleep666/short_chain/config"
 	"github.com/daysleep666/short_chain/pkg/repo"
 )
 
 func initPprofMonitor() {
-	addr := ":" + strconv.Itoa(8080)
-
-	go func() {
-		if err := http.ListenAndServe(addr, nil); err != nil {
-			log.Fatalf("funcRetErr=http.ListenAndServe err=%s", err.Error())
-		}
-	}()
+	if err := http.ListenAndServe("0.0.0.0:8080", nil); err != nil {
+		log.Fatalf("funcRetErr=http.ListenAndServe err=%s", err.Error())
+	}
 }
 
 func MustInit(configPath string) {
@@ -34,7 +29,7 @@ func MustInit(configPath string) {
 		log.Fatalf("init redis failed err:%v", err)
 	}
 
-	initPprofMonitor()
+	go initPprofMonitor()
 
 	InitUniqueIDSerInstance(config.CONFIG_INSTANCE.ServerConfig.MachineID)
 	InitUniqueIDSerForLoggerInstance(config.CONFIG_INSTANCE.ServerConfig.LoggerMachineID)
