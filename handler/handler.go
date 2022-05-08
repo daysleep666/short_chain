@@ -87,7 +87,7 @@ func ShortChainRedirect(c echo.Context) (err error) {
 
 func newShortChainService(logger pkg.Logger) (*service.ShortChainService, error) {
 	return service.NewShortChainService(&service.ShortChainServiceParam{
-		UniqueIDService:        pkg.NewUniqueIDSnowflakeService(config.CONFIG_INSTANCE.ServerConfig.MachineID),
+		UniqueIDService:        pkg.UNIQUE_ID_SERVICE_INSTANCE,
 		ConverterService:       pkg.NewConverterService(),
 		ShortURLStorageService: pkg.NewShortURLStorageService(logger, config.CONFIG_INSTANCE.ShortURLMysqlConfig.TableCnt),
 		Log:                    logger,

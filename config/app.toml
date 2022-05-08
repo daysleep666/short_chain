@@ -15,4 +15,5 @@
 
 [server]
     machine_id = 1
+    logger_machine_id = 0
     domain = "http://39.100.89.154"

@@ -1,6 +1,10 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+
+	"go.uber.org/atomic"
+)
 
 func findDuplicates(nums []int) (result []int) {
 	for i := 0; i < len(nums); {
@@ -22,7 +26,10 @@ func findDuplicates(nums []int) (result []int) {
 }
 
 func main() {
-	fmt.Println(findDuplicates([]int{4, 3, 2, 7, 8, 2, 3, 1}))
-	fmt.Println(findDuplicates([]int{1, 1, 2}))
-	fmt.Println(findDuplicates([]int{1}))
+	var number atomic.Int64
+	for {
+
+		fmt.Println(number.Inc() & 4095)
+	}
+
 }

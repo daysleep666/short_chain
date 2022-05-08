@@ -23,8 +23,9 @@ type LoggerConfig struct {
 }
 
 type ServerConfig struct {
-	Domain    string `toml:"domain"`
-	MachineID int64  `toml:"machine_id"`
+	Domain          string `toml:"domain"`
+	MachineID       int64  `toml:"machine_id"`
+	LoggerMachineID int64  `toml:"logger_machine_id"`
 }
 
 type Config struct {

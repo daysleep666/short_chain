@@ -20,4 +20,7 @@ func MustInit(configPath string) {
 	if err := InitLogger(config.CONFIG_INSTANCE.LoggerConfig.FilePath); err != nil {
 		log.Fatalf("init redis failed err:%v", err)
 	}
+
+	InitUniqueIDSerInstance(config.CONFIG_INSTANCE.ServerConfig.MachineID)
+	InitUniqueIDSerForLoggerInstance(config.CONFIG_INSTANCE.ServerConfig.LoggerMachineID)
 }

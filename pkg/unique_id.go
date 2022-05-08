@@ -22,8 +22,6 @@ type UniqueIDService interface {
 	Generate(ctx context.Context) (uint64, error)
 }
 
-var UNIQUE_ID_SERVICE_INSTANCE UniqueIDService
-
 type uniqueIDServiceRedis struct {
 	logger Logger
 }
@@ -41,6 +39,17 @@ func (r *uniqueIDServiceRedis) Generate(ctx context.Context) (uint64, error) {
 		return 0, config.DB_ERROR
 	}
 	return id, nil
+}
+
+var UNIQUE_ID_SERVICE_INSTANCE UniqueIDService
+var UNIQUE_ID_SERVICE_FOR_LOGGER_INSTANCE UniqueIDService
+
+func InitUniqueIDSerInstance(machineID int64) {
+	UNIQUE_ID_SERVICE_INSTANCE = NewUniqueIDSnowflakeService(machineID)
+}
+
+func InitUniqueIDSerForLoggerInstance(machineID int64) {
+	UNIQUE_ID_SERVICE_FOR_LOGGER_INSTANCE = NewUniqueIDSnowflakeService(machineID)
 }
 
 type uniqueIDServiceSnowflake struct {
