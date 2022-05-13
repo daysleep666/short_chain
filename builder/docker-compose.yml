@@ -53,4 +53,5 @@ services:
      - redis
     ports:
      - "1234:1234"
+     - "8080:8080"
     restart: always

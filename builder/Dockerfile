@@ -27,6 +27,7 @@ RUN cp /root/golang/gopath/src/github.com/daysleep666/short_chain/config/app.tom
 RUN cp -r /root/golang/gopath/src/github.com/daysleep666/short_chain/static ./
 # 声明服务端口
 EXPOSE 1234
+EXPOSE 8080
 
 # 启动容器时运行的命令
 CMD ["/dist/app"]
